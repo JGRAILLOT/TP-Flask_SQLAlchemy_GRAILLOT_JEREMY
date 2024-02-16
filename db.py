@@ -167,7 +167,7 @@ def creer_reservation():
     # Vérification de la disponibilité de la chambre pour les dates demandées
     reservations = Reservation.query.filter_by(id_chambre=id_chambre).all()
     for reservation in reservations:
-        if (date_arrivee < reservation.date_depart) and (date_depart > reservation.date_arrivee):
+        if (date_arrivee <= reservation.date_depart) and (date_depart >= reservation.date_arrivee):
             return jsonify({'success': False, 'message': 'La chambre n\'est pas disponible pour ces dates'}), 400
 
     # Création de la réservation
