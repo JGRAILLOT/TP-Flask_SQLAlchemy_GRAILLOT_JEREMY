@@ -38,7 +38,6 @@
     </form>
 
     <script>
-        // Fetch and populate options for Client select
         fetch('/api/clients')
             .then(response => response.json())
             .then(clients => {
@@ -54,7 +53,6 @@
                 console.error('Error fetching clients:', error);
             });
 
-        // Fetch and populate options for Chambre select
         fetch('/api/chambres')
             .then(response => response.json())
             .then(chambres => {
@@ -70,7 +68,6 @@
                 console.error('Error fetching chambres:', error);
             });
 
-        // Handle form submission
         document.getElementById("reservationForm").addEventListener("submit", function (event) {
             event.preventDefault();
             var id_client = document.getElementById("id_client").value;
