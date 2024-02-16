@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation List</title>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/clientlist.html">Client List</a></li>
+                <li><a href="/chambrelist.html">Chambre List</a></li>
+                <li><a href="/reservationlist.html">Reservation List</a></li>
+                <li><a href="/clientform.html">Create Client</a></li>
+                <li><a href="/chambreform.html">Create Chambre</a></li>
+                <li><a href="/reservationform.html">Create Reservation</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1>Reservation List</h1>
+    <ul id="reservationList"></ul>
+
+    <script>
+        async function getChambreById(id) {
+            const response = await fetch(`/api/chambres/${id}`);
+            const chambre = await response.json();
+            return chambre.numero;
+        }
+        async function getClientById(id) {
+            const response = await fetch(`/api/clients/${id}`);
+            const client = await response.json();
+            return client.nom;
+        }
+
+        fetch('/api/reservations')
+            .then(response => response.json())
+            .then(data => {
+                var reservationList = document.getElementById('reservationList');
+                data.forEach(async reservation => {
+                    const chambreNumero = await getChambreById(reservation.id_chambre);
+                    const clientNom = await getClientById(reservation.id_client);
+
+                    var listItem = document.createElement('li');
+                    listItem.textContent = `Reservation ID: ${reservation.id}, Chambre: ${chambreNumero}, Client: ${clientNom}, Arrival Date: ${reservation.date_arrivee}, Departure Date: ${reservation.date_depart}, Status: ${reservation.statut}`;
+
+                    var deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.onclick = function () {
+                        fetch(`/api/reservations/${reservation.id}`, {
+                            method: 'DELETE'
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                alert(data.message);
+                                listItem.remove();
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                    };
+                    listItem.appendChild(deleteButton);
+                    reservationList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chambre List</title>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/clientlist.html">Client List</a></li>
+                <li><a href="/chambrelist.html">Chambre List</a></li>
+                <li><a href="/reservationlist.html">Reservation List</a></li>
+                <li><a href="/clientform.html">Create Client</a></li>
+                <li><a href="/chambreform.html">Create Chambre</a></li>
+                <li><a href="/reservationform.html">Create Reservation</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1>Chambre List</h1>
+    <ul id="chambreList"></ul>
+
+    <script>
+        var currentDate = new Date().toISOString().split('T')[0];
+        var disponibles;
+
+        fetch('/api/chambres/disponibles?date_arrivee=' + currentDate + '&date_depart=' + currentDate)
+            .then(response => response.json())
+            .then(data => {
+                disponibles = data;
+                fetchChambres();
+            })
+            .catch(error => {
+                console.error('Error fetching disponibilité:', error);
+            });
+
+        function fetchChambres() {
+            fetch('/api/chambres')
+                .then(response => response.json())
+                .then(data => {
+                    var chambreList = document.getElementById('chambreList');
+                    data.forEach(chambre => {
+                        var listItem = document.createElement('li');
+                        listItem.textContent = `Chambre ID: ${chambre.id}, Numero: ${chambre.numero}, Type: ${chambre.type}, Prix: ${chambre.prix}`;
+
+                        const disponible = disponibles.find(dispo => dispo.id === chambre.id);
+                        const disponibiliteText = disponible ? 'Disponible ' : 'Non disponible ';
+                        listItem.textContent += `, Disponibilité: ${disponibiliteText}`;
+
+                        var modifyButton = document.createElement('button');
+                        modifyButton.textContent = 'Modify';
+                        modifyButton.onclick = function () {
+                            window.location.href = `/modify-chambre/${chambre.id}`;
+                        };
+
+                        var deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Delete';
+                        deleteButton.onclick = function () {
+                            fetch(`/api/chambres/${chambre.id}`, {
+                                method: 'DELETE'
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    alert(data.message);
+                                    listItem.remove();
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                });
+                        };
+
+                        listItem.appendChild(modifyButton);
+                        listItem.appendChild(deleteButton);
+                        chambreList.appendChild(listItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>

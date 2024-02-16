@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Chambre</title>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/clientlist.html">Client List</a></li>
+                <li><a href="/chambrelist.html">Chambre List</a></li>
+                <li><a href="/reservationlist.html">Reservation List</a></li>
+                <li><a href="/clientform.html">Create Client</a></li>
+                <li><a href="/chambreform.html">Create Chambre</a></li>
+                <li><a href="/reservationform.html">Create Reservation</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1>Create Chambre</h1>
+    <form id="chambreForm">
+        <label for="numero">Numero:</label><br>
+        <input type="text" id="numero" name="numero"><br>
+        <label for="type">Type:</label><br>
+        <input type="text" id="type" name="type"><br>
+        <label for="prix">Prix:</label><br>
+        <input type="number" id="prix" name="prix"><br><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById("chambreForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            var numero = document.getElementById("numero").value;
+            var type = document.getElementById("type").value;
+            var prix = document.getElementById("prix").value;
+
+            fetch('/api/chambres', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ numero: numero, type: type, prix: prix })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById("chambreForm").reset();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>

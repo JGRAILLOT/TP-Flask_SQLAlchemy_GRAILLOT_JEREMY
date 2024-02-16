@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Reservation</title>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/clientlist.html">Client List</a></li>
+                <li><a href="/chambrelist.html">Chambre List</a></li>
+                <li><a href="/reservationlist.html">Reservation List</a></li>
+                <li><a href="/clientform.html">Create Client</a></li>
+                <li><a href="/chambreform.html">Create Chambre</a></li>
+                <li><a href="/reservationform.html">Create Reservation</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1>Create Reservation</h1>
+    <form id="reservationForm">
+        <label for="id_client">Client:</label><br>
+        <select id="id_client" name="id_client">
+            <!-- Options will be populated dynamically -->
+        </select><br>
+        <label for="id_chambre">Chambre:</label><br>
+        <select id="id_chambre" name="id_chambre">
+            <!-- Options will be populated dynamically -->
+        </select><br>
+        <label for="date_arrivee">Arrival Date:</label><br>
+        <input type="date" id="date_arrivee" name="date_arrivee"><br>
+        <label for="date_depart">Departure Date:</label><br>
+        <input type="date" id="date_depart" name="date_depart"><br><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        // Fetch and populate options for Client select
+        fetch('/api/clients')
+            .then(response => response.json())
+            .then(clients => {
+                const idClientSelect = document.getElementById("id_client");
+                clients.forEach(client => {
+                    const option = document.createElement("option");
+                    option.value = client.id;
+                    option.textContent = client.nom;
+                    idClientSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching clients:', error);
+            });
+
+        // Fetch and populate options for Chambre select
+        fetch('/api/chambres')
+            .then(response => response.json())
+            .then(chambres => {
+                const idChambreSelect = document.getElementById("id_chambre");
+                chambres.forEach(chambre => {
+                    const option = document.createElement("option");
+                    option.value = chambre.id;
+                    option.textContent = chambre.numero;
+                    idChambreSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching chambres:', error);
+            });
+
+        // Handle form submission
+        document.getElementById("reservationForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            var id_client = document.getElementById("id_client").value;
+            var id_chambre = document.getElementById("id_chambre").value;
+            var date_arrivee = document.getElementById("date_arrivee").value;
+            var date_depart = document.getElementById("date_depart").value;
+
+            fetch('/api/reservations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id_client: id_client, id_chambre: id_chambre, date_arrivee: date_arrivee, date_depart: date_depart })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById("reservationForm").reset();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>

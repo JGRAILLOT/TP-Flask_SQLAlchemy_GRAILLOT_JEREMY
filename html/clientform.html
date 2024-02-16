@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Client</title>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/clientlist.html">Client List</a></li>
+                <li><a href="/chambrelist.html">Chambre List</a></li>
+                <li><a href="/reservationlist.html">Reservation List</a></li>
+                <li><a href="/clientform.html">Create Client</a></li>
+                <li><a href="/chambreform.html">Create Chambre</a></li>
+                <li><a href="/reservationform.html">Create Reservation</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1>Create Client</h1>
+    <form id="clientForm">
+        <label for="nom">Nom:</label><br>
+        <input type="text" id="nom" name="nom"><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email"><br><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById("clientForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            var nom = document.getElementById("nom").value;
+            var email = document.getElementById("email").value;
+
+            fetch('/api/clients', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nom: nom, email: email })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById("clientForm").reset();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client List</title>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/clientlist.html">Client List</a></li>
+                <li><a href="/chambrelist.html">Chambre List</a></li>
+                <li><a href="/reservationlist.html">Reservation List</a></li>
+                <li><a href="/clientform.html">Create Client</a></li>
+                <li><a href="/chambreform.html">Create Chambre</a></li>
+                <li><a href="/reservationform.html">Create Reservation</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1>Client List</h1>
+    <ul id="clientList"></ul>
+
+    <script>
+        fetch('/api/clients')
+            .then(response => response.json())
+            .then(data => {
+                var clientList = document.getElementById('clientList');
+                data.forEach(client => {
+                    var listItem = document.createElement('li');
+                    listItem.textContent = `Client ID: ${client.id}, Nom: ${client.nom}, Email: ${client.email}`;
+
+                    // Add delete button for client
+                    var deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.onclick = function () {
+                        // Send DELETE request to delete client
+                        fetch(`/api/clients/${client.id}`, {
+                            method: 'DELETE'
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                alert(data.message);
+                                // Remove client from UI if successfully deleted
+                                listItem.remove();
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                    };
+
+                    listItem.appendChild(deleteButton);
+                    clientList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    </script>
+</body>
+
+</html>
